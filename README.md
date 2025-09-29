@@ -11,10 +11,10 @@ A Cashier web-based app with Admin analytic dashboard init.
 
 ### Step 1 : Inital Setup (After Cloning)
 
-**If In Linux**
+**If In Linux, GL WIN Users**
 
 ```bash
-Chmod +x scripts/*
+chmod +x scripts/*
 ```
 
 #### Check Environment
