@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             "name" => "fairus",
             "username" => "irus",
             "password" => "test",
-            "role" => "admin"
+            "role" => "manager"
         ]);
     }
 }

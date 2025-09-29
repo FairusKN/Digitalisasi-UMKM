@@ -10,7 +10,7 @@ Route::get("/", function() {
 
 Route::prefix("auth")->group(function () {
     Route::post("register", [AuthController::class, 'register'])
-        ->middleware('auth:sanctum', 'role:admin');
+        ->middleware('auth:sanctum', 'role:manager');
 
     Route::post("login", [AuthController::class, 'login']);
     Route::post("logout", [AuthController::class, 'logout'])
