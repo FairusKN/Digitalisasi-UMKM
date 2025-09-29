@@ -10,12 +10,10 @@ Route::get("/", function() {
 
 Route::prefix("auth")->group(function () {
     Route::post("register", [AuthController::class, 'register'])
-        ->middleware('auth:sanctum', 'role:super_user');
+        ->middleware('auth:sanctum', 'role:admin');
 
-    //any users
     Route::post("login", [AuthController::class, 'login']);
     Route::post("logout", [AuthController::class, 'logout'])
         ->middleware('auth:sanctum');
 })
-
 ?>

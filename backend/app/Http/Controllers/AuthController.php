@@ -2,60 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\Login;
+use App\Http\Requests\Auth\Register;
 use App\Models\User;
-use Hash;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use function PHPUnit\Framework\returnArgument;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Register $request) : JsonResponse
     {
-        $fields = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'phone_number' => 'required|unique:users',
-            'password' => 'required|confirmed',
-            'is_admin' => 'boolean',
-            'is_superuser' => 'boolean',
-        ]);
+        try {
+            $user = User::create($request->validated());
 
-        $user = User::create($fields);
+            return response()->json([
+                "user" => $user
+            ]);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23505') { // Unique Code Violation
+                return response()->json([
+                    'message' => 'Username already taken'
+                ], 409);
+            }
 
-        return response()->json([
-            "user" => $user
-        ]);
+            throw $e;
+        }
     }
 
-    public function login(Request $request)
+    public function login(Login $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email|exists:users',
-            //'phone_number' => 'required|exists:users',
-            'password' => 'required',
-        ]);
+        $fields = $request->validated();
+        $user = User::where('username', $fields["username"])->first();
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return [
+        if (!$user || !Hash::check($fields["password"], $user->password)) {
+            return response()->json([
                 "message" => "The Provided Credentials may be Invalid"
-            ];
+            ], 400);
         }
 
-        $token =  $user->createToken($user->name);
+        $token = $user->createToken(
+            $user->name,
+            ['*'],
+            now()->addMinutes(config('sanctum.expiration'))
+        );
 
-        return [
+        return response()->json([
             'user' => $user,
             'token' => $token->plainTextToken
-        ];
+        ], 201);
     }
 
-    public  function logout(Request $request) {
+    public  function logout(Request $request) : JsonResponse {
         $request->user()->tokens()->delete();
 
-        return [
+        return response()->json([
             'message' => "You are logout"
-        ];
+        ], 201);
     }
 }
