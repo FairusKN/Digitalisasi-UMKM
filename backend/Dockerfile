@@ -15,3 +15,5 @@ WORKDIR /var/www/backend
 EXPOSE 9000
 
 CMD ["php-fpm"]
+
+USER www
