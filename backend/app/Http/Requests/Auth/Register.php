@@ -25,7 +25,7 @@ class Register extends FormRequest
     {
         return [
             'name' => 'required',
-            'username' => 'required',
+            'username' => 'required|string|unique:users,username',
             'password' => 'required|confirmed',
             'role' => ['required', new Enum(Role::class)],
         ];
