@@ -12,12 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create("order_items", function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->foreignUuid("order_id")->constrained()->cascadeOnDelete();
             $table->foreignUuid("product_id")->constrained()->restrictOnDelete();
             $table->integer("quantity");
-            $table->decimal("unit_price", 12, 2); // Add cuz chance products price change
-            $table->decimal("subtotal", 12,2);
+            $table->decimal("price", 12, 2); // Price at time of order
             $table->timestamps();
 
             $table->index('order_id');
