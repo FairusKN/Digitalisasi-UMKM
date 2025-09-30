@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum("role", array_column(Role::cases(), 'value'))->default(Role::Cashier->value);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Schema::create('password_reset_tokens', function (Blueprint $table) {
