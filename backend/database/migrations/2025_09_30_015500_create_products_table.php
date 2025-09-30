@@ -1,5 +1,6 @@
 <?php
 
+use App\ProductCategory;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,7 @@ return new class extends Migration
             $table->decimal("price", 12,2);
             $table->boolean("is_available")->default(true);
             $table->string("image_path");
+            $table->enum("category", array_column(ProductCategory::cases(), "value"));
             $table->timestamps();
             $table->softDeletes();
         });
