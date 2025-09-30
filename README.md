@@ -41,7 +41,6 @@ docker-compose up --build -d
 
 ```bash
 curl localhost/api
-curl localhost
 ```
 
 ## Some Script To Easily Do Artisan Command
