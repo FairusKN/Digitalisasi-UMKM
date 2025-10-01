@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", function() {
@@ -27,5 +28,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [OrderController::class, 'index']); // Untuk manager analytics/dashboard
         Route::post('/', [OrderController::class, 'store']); // Untuk cashier buat order
     });
+
+    Route::prefix("manager")->middleware("role:manager")->group(function () {
+        Route::prefix("products")->group(function() {
+            Route::get('/', [ProductController::class, "index"]);
+            Route::get('/{id}', [ProductController::class, "show"])
+                ->whereUuid('id');
+            Route::post('/', [ProductController::class, 'store']);
+            Route::put('/{id}', [ProductController::class, 'update'])
+                ->whereUuid('id');
+            Route::delete('/{id}', [ProductController::class, 'destroy'])
+                ->whereUuid('id');
+        });
+    });
+
 });
 ?>
