@@ -4,6 +4,8 @@ use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,5 +20,45 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Resource not found'
+                ], 404);
+            }
+
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Database error',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->getMessage()
+                ], 422);
+            }
+
+            if ($e instanceof InvalidArgumentException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Wrong Argument',
+                    'error' => $e->getMessage()
+                ], 422);
+            }
+
+            // Default fallback for other exceptions
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+                'error' => $e->getMessage()
+            ], 500);
+        });
+
+
     })->create();
