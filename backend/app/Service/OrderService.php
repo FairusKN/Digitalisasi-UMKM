@@ -62,7 +62,7 @@ class OrderService
     }
 
     /**
-     * Get all orders with optional filtering
+     * Get all orders with optional filtering (for manager analytics/dashboard)
      *
      * @param array $filters
      * @return Collection
@@ -84,84 +84,5 @@ class OrderService
         }
 
         return $query->orderBy('created_at', 'desc')->get();
-    }
-
-    /**
-     * Get order by ID
-     *
-     * @param string $id
-     * @return Order|null
-     */
-    public function getById(string $id): ?Order
-    {
-        return Order::with(['items.product', 'user'])->find($id);
-    }
-
-    /**
-     * Get orders by user ID
-     *
-     * @param string $userId
-     * @return Collection
-     */
-    public function getByUserId(string $userId): Collection
-    {
-        return Order::with(['items.product'])
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    /**
-     * Update order status or other fields
-     *
-     * @param string $id
-     * @param array $fields
-     * @return Order|null
-     */
-    public function update(string $id, array $fields): ?Order
-    {
-        $order = Order::find($id);
-        
-        if (!$order) {
-            return null;
-        }
-
-        $order->update($fields);
-        $order->load(['items.product', 'user']);
-
-        return $order;
-    }
-
-    /**
-     * Delete order
-     *
-     * @param string $id
-     * @return bool
-     */
-    public function delete(string $id): bool
-    {
-        $order = Order::find($id);
-        
-        if (!$order) {
-            return false;
-        }
-
-        try {
-            DB::beginTransaction();
-
-            // Delete order items first
-            $order->items()->delete();
-            
-            // Delete the order
-            $order->delete();
-
-            DB::commit();
-
-            return true;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
     }
 }

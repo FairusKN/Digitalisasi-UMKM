@@ -23,12 +23,8 @@ Route::prefix("auth")->group(function () {
 // Order routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('orders')->group(function () {
-        Route::get('/', [OrderController::class, 'index']);
-        Route::post('/', [OrderController::class, 'store']);
-        Route::get('/my-orders', [OrderController::class, 'myOrders']);
-        Route::get('/{id}', [OrderController::class, 'show']);
-        Route::put('/{id}', [OrderController::class, 'update']);
-        Route::delete('/{id}', [OrderController::class, 'destroy']);
+        Route::get('/', [OrderController::class, 'index']); // Untuk manager analytics/dashboard
+        Route::post('/', [OrderController::class, 'store']); // Untuk cashier buat order
     });
 });
 ?>

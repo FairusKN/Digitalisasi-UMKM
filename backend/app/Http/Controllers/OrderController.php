@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Order\CreateOrder;
-use App\Http\Requests\Order\UpdateOrder;
 use App\Service\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Display a listing of orders
+     * Display a listing of orders (for manager analytics/dashboard)
      */
     public function index(Request $request): JsonResponse
     {
@@ -43,12 +42,12 @@ class OrderController extends Controller
     }
 
     /**
-     * Store a newly created order
+     * Store a newly created order (for cashier)
      */
     public function store(CreateOrder $request): JsonResponse
     {
         try {
-            $userId = Auth::id();
+            $userId = Auth::id(); // ID cashier yang membuat order
             $order = $this->orderService->create($request->validated(), $userId);
 
             return response()->json([
@@ -60,115 +59,6 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create order',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified order
-     */
-    public function show(string $id): JsonResponse
-    {
-        try {
-            $order = $this->orderService->getById($id);
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $order,
-                'message' => 'Order retrieved successfully'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve order',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Update the specified order
-     */
-    public function update(UpdateOrder $request, string $id): JsonResponse
-    {
-        try {
-            $order = $this->orderService->update($id, $request->validated());
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $order,
-                'message' => 'Order updated successfully'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update order',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Remove the specified order
-     */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $deleted = $this->orderService->delete($id);
-
-            if (!$deleted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Order not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Order deleted successfully'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete order',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get orders for the authenticated user
-     */
-    public function myOrders(): JsonResponse
-    {
-        try {
-            $userId = Auth::id();
-            $orders = $this->orderService->getByUserId($userId);
-
-            return response()->json([
-                'success' => true,
-                'data' => $orders,
-                'message' => 'User orders retrieved successfully'
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve user orders',
                 'error' => $e->getMessage()
             ], 500);
         }
