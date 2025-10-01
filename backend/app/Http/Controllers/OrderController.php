@@ -7,6 +7,8 @@ use App\Service\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Exception;
 
 class OrderController extends Controller
@@ -19,23 +21,27 @@ class OrderController extends Controller
     }
 
     /**
-     * Display a listing of orders (for manager analytics/dashboard)
+     * Get order analytics with count (for manager dashboard charts)
+     * Example: /api/orders?is_takeaway=false&payment_method=qris
      */
     public function index(Request $request): JsonResponse
     {
         try {
             $filters = $request->only(['user_id', 'payment_method', 'is_takeaway']);
-            $orders = $this->orderService->getAll($filters);
+            $count = $this->orderService->getOrderCount($filters);
 
             return response()->json([
                 'success' => true,
-                'data' => $orders,
-                'message' => 'Orders retrieved successfully'
+                'message' => 'Order analytics retrieved successfully',
+                'data' => [
+                    'count' => $count,
+                    'filters' => $filters
+                ]
             ]);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve orders',
+                'message' => 'Failed to retrieve order analytics',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -52,9 +58,21 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $order,
-                'message' => 'Order created successfully'
+                'message' => 'Order created successfully',
+                'data' => $order
             ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Database error occurred',
+                'error' => 'Failed to save order to database'
+            ], 500);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,

@@ -18,11 +18,16 @@ class AuthController extends Controller
             $user = User::create($request->validated());
 
             return response()->json([
-                "user" => $user
-            ]);
+                'success' => true,
+                'message' => 'User registered successfully',
+                'data' => [
+                    'user' => $user
+                ]
+            ], 201);
         } catch (QueryException $e) {
             if ($e->getCode() === '23505') { // Unique Code Violation
                 return response()->json([
+                    'success' => false,
                     'message' => 'Username already taken'
                 ], 409);
             }
@@ -38,7 +43,8 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($fields["password"], $user->password)) {
             return response()->json([
-                "message" => "The Provided Credentials may be Invalid"
+                'success' => false,
+                'message' => 'The provided credentials may be invalid'
             ], 400);
         }
 
@@ -49,16 +55,21 @@ class AuthController extends Controller
         );
 
         return response()->json([
-            'user' => $user,
-            'token' => $token->plainTextToken
-        ], 201);
+            'success' => true,
+            'message' => 'Login successful',
+            'data' => [
+                'user' => $user,
+                'token' => $token->plainTextToken
+            ]
+        ], 200);
     }
 
-    public  function logout(Request $request) : JsonResponse {
+    public function logout(Request $request) : JsonResponse {
         $request->user()->tokens()->delete();
 
         return response()->json([
-            'message' => "You are logout"
-        ], 201);
+            'success' => true,
+            'message' => 'You have been logged out successfully'
+        ], 200);
     }
 }

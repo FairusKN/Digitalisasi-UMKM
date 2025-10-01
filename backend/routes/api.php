@@ -6,9 +6,10 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", function() {
-return response()->json([
-    "message" => "it's working"
-], 201);
+    return response()->json([
+        'success' => true,
+        'message' => "API is working"
+    ], 200);
 });
 
 Route::prefix("auth")->group(function () {

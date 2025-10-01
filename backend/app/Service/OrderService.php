@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Exception;
 
 class OrderService
@@ -22,7 +23,7 @@ class OrderService
      * @param array $fields
      * @param string $userId
      * @return Order
-     * @throws Exception
+     * @throws QueryException|Exception
      */
     public function create(array $fields, string $userId): Order
     {
@@ -55,10 +56,43 @@ class OrderService
 
             return $order;
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            throw new QueryException(
+                $e->getConnectionName(),
+                $e->getSql(),
+                $e->getBindings(),
+                $e->getPrevious()
+            );
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Get order count with optional filtering (for manager analytics/charts)
+     *
+     * @param array $filters
+     * @return int
+     */
+    public function getOrderCount(array $filters = []): int
+    {
+        $query = Order::query();
+
+        if (isset($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
+        if (isset($filters['payment_method'])) {
+            $query->where('payment_method', $filters['payment_method']);
+        }
+
+        if (isset($filters['is_takeaway'])) {
+            $query->where('is_takeaway', $filters['is_takeaway']);
+        }
+
+        return $query->count();
     }
 
     /**

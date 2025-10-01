@@ -17,11 +17,17 @@ class RoleMiddleware
         $validRoles = array_column(Role::cases(), 'value');
 
         if (!in_array($role, $validRoles, true)) {
-            return response()->json(["message" => "Invalid role specified"], 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid role specified'
+            ], 400);
         }
 
         if ($user->role !== $role) {
-            return response()->json(["message" => "Forbidden"], 403);
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden'
+            ], 403);
         }
 
         return $next($request);
