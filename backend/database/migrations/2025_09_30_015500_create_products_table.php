@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->string("name");
+            $table->string("name")->unique();
             $table->decimal("price", 12,2);
             $table->boolean("is_available")->default(true);
             $table->string("image_path");
