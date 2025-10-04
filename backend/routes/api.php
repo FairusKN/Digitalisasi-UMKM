@@ -7,12 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/", function() {
-    return response()->json([
-        'success' => true,
-        'message' => "API is working"
-    ], 200);
-});
+Route::get("/", fn() => response()->json(["success" => true]));
 
 Route::prefix("auth")->group(function () {
     Route::post("login", [AuthController::class, 'login']);
