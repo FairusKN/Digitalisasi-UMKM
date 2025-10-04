@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckTokenExpiration;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SuperUserMiddleware;
 use Illuminate\Foundation\Application;
@@ -18,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => RoleMiddleware::class,
-            'superuser' => SuperUserMiddleware::class
+            'superuser' => SuperUserMiddleware::class,
+            'checktoken' => CheckTokenExpiration::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
