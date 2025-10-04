@@ -73,13 +73,6 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        if(!$product) {
-            return response()->json([
-                "success" => false,
-                "message" => "There is no Product with Such ID"
-            ], 404);
-        }
-
         $updatedProduct =  $this->productService->updateProduct($request->validated(), $product);
         return response()->json([
             "success" => true,

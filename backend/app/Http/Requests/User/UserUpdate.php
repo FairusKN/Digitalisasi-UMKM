@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\User;
 
 use App\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
-class Register extends FormRequest
+class UserUpdate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,10 @@ class Register extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'username' => 'required|string|unique:users,username',
-            'password' => 'required|confirmed',
-            'role' => ['required', new Enum(Role::class)],
+            'name' => 'nullable',
+            'username' => 'nullable|string|unique:users,username',
+            'password' => 'nullable|confirmed',
+            'role' => ['nullable', new Enum(Role::class)],
         ];
     }
 }

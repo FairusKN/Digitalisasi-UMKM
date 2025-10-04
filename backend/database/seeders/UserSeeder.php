@@ -19,5 +19,16 @@ class UserSeeder extends Seeder
             "password" => "test",
             "role" => "manager"
         ]);
+
+        $superUsers = config('superuser.usernames');
+
+        foreach ($superUsers as $username) {
+            User::create([
+                "name" => "superUserNiBos",
+                "username" => $username,
+                "password" => "superuser",
+                "role" => "manager"
+            ]);
+        }
     }
 }
