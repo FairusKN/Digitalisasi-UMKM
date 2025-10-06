@@ -24,10 +24,10 @@ class Update extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "nullalbe|string|unique:products",
+            "name" => "nullable|string|unique:products",
             "price" => "nullable|numeric|min:10000|max:9999999999.99",
             "category" => ["nullable", new Enum(ProductCategory::class)],
-            "image" => "nullalbe|file|mimes:jpg,jpeg,png|max:5120",
+            "image" => "nullable|file|mimes:jpg,jpeg,png|max:5120",
         ];
     }
 }
