@@ -15,7 +15,6 @@ Route::prefix("auth")->group(function () {
         ->middleware('auth:sanctum');
 });
 
-// Order routes
 Route::middleware(['auth:sanctum', 'checktoken'])->group(function () {
     Route::prefix('orders')->group(function () {
         Route::post('/', [OrderController::class, 'store']);
@@ -25,6 +24,12 @@ Route::middleware(['auth:sanctum', 'checktoken'])->group(function () {
         Route::apiResource("products", ProductController::class)->whereUuid("product");
         Route::apiResource("users", UserController::class)->whereUuid("user");
     });
-
 });
+
+//Product for public/cashier
+Route::prefix("products")->group(function() {
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/{id}', [ProductController::class, 'show'])
+        ->whereUuid("id");
+})
 ?>
