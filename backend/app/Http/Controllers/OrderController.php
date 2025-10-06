@@ -32,7 +32,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order analytics retrieved successfully',
+                'message' => 'Analitik pesanan berhasil diambil',
                 'data' => [
                     'count' => $count,
                     'filters' => $filters
@@ -41,7 +41,7 @@ class OrderController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve order analytics',
+                'message' => 'Gagal mengambil analitik pesanan',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -58,25 +58,25 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order created successfully',
+                'message' => 'Pesanan berhasil dibuat',
                 'data' => $order
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Validasi gagal',
                 'errors' => $e->errors()
             ], 422);
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Database error occurred',
+                'message' => 'Terjadi kesalahan database',
                 'error' => 'Failed to save order to database'
             ], 500);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create order',
+                'message' => 'Gagal membuat pesanan',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -28,14 +28,14 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Resource not found'
+                    'message' => 'Sumber daya tidak ditemukan'
                 ], 404);
             }
 
             if ($e instanceof \Illuminate\Database\QueryException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Database error',
+                    'message' => 'Kesalahan database',
                     'error' => $e->getMessage()
                 ], 500);
             }
@@ -43,15 +43,15 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $e->getMessage()
+                    'message' => 'Validasi gagal',
+                    'errors' => $e->errors()
                 ], 422);
             }
 
             if ($e instanceof InvalidArgumentException) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Wrong Argument',
+                    'message' => 'Argumen salah',
                     'error' => $e->getMessage()
                 ], 422);
             }
@@ -59,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Default fallback for other exceptions
             return response()->json([
                 'success' => false,
-                'message' => 'Internal server error',
+                'message' => 'Kesalahan server internal',
                 'error' => $e->getMessage()
             ], 500);
         });

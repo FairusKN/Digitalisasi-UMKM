@@ -47,7 +47,7 @@ class ProductController extends Controller
 
         return response()->json([
             "success" => true,
-            "message" => "Success to Create product",
+            "message" => "Berhasil membuat produk",
             "data" => $product
         ], 201);
     }
@@ -61,7 +61,7 @@ class ProductController extends Controller
 
         return response()->json([
             "success" => true,
-            'message' => 'Success to retrieve order analytics',
+            'message' => 'Berhasil mengambil data produk',
             "data" => $products
         ], 200);
     }
@@ -76,7 +76,7 @@ class ProductController extends Controller
         $updatedProduct =  $this->productService->updateProduct($request->validated(), $product);
         return response()->json([
             "success" => true,
-            "message" => "Success Updated a Product",
+            "message" => "Berhasil mengupdate produk",
             "data" => $updatedProduct
         ],201);
     }
@@ -91,7 +91,7 @@ class ProductController extends Controller
         $product->delete();
         return response()->json([
             "success" => true,
-            "message" => "Success deleted a Product",
+            "message" => "Berhasil menghapus produk",
         ],201);
     }
 }

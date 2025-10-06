@@ -30,10 +30,21 @@ class OrderService
         try {
             DB::beginTransaction();
 
+            // Calculate cash change if payment method is cash
+            $cashReceived = $fields['cash_received'] ?? null;
+            $cashChange = null;
+            
+            if ($fields['payment_method'] === 'cash' && $cashReceived !== null) {
+                $cashChange = $cashReceived - $fields['total'];
+            }
+
             // Create the order
             $order = Order::create([
                 'user_id' => $userId,
+                'customer_name' => $fields['customer_name'],
                 'total' => $fields['total'],
+                'cash_received' => $cashReceived,
+                'cash_change' => $cashChange,
                 'note' => $fields['note'] ?? null,
                 'is_takeaway' => $fields['is_takeaway'] ?? false,
                 'payment_method' => $fields['payment_method'],
@@ -41,11 +52,14 @@ class OrderService
 
             // Create order items
             foreach ($fields['items'] as $item) {
+                // Get price from product automatically
+                $product = Product::findOrFail($item['product_id']);
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'],
+                    'price' => $product->price,
                 ]);
             }
 

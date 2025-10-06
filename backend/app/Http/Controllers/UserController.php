@@ -62,7 +62,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('User registered successfully'),
+            'message' => 'Pengguna berhasil didaftarkan',
             'data' => $user,
         ], 201);
     }
@@ -75,7 +75,7 @@ class UserController extends Controller
 
         return response()->json([
             "success" => true,
-            "message" => __("User Retreive Successfully"),
+            "message" => "Data pengguna berhasil diambil",
             "data" => $user
         ],200);
     }
@@ -93,7 +93,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('User updated successfully'),
+            'message' => 'Pengguna berhasil diperbarui',
             'data' => $userToUpdate,
         ], 200);
     }
@@ -105,7 +105,7 @@ class UserController extends Controller
 
         return response()->json([
             "success" => true,
-            "message" => __('User deleted successfully'),
+            "message" => 'Pengguna berhasil dihapus',
         ], 200);
     }
 }

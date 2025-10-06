@@ -13,7 +13,10 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'customer_name',
         'total',
+        'cash_received',
+        'cash_change',
         'note',
         'is_takeaway',
         'payment_method',
@@ -21,6 +24,8 @@ class Order extends Model
 
     protected $casts = [
         'total' => 'decimal:2',
+        'cash_received' => 'decimal:2',
+        'cash_change' => 'decimal:2',
         'is_takeaway' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

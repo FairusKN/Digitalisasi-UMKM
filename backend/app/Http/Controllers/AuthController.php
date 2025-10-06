@@ -24,7 +24,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($fields["password"], $user->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'The provided credentials may be invalid'
+                'message' => 'Kredensial yang diberikan mungkin tidak valid'
             ], 400);
         }
 
@@ -36,7 +36,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Login successful',
+            'message' => 'Login berhasil',
             'data' => [
                 'user' => $user,
                 'token' => $token->plainTextToken
@@ -49,7 +49,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'You have been logged out successfully'
+            'message' => 'Anda telah berhasil logout'
         ], 200);
     }
 }
