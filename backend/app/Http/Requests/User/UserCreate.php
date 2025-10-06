@@ -27,7 +27,7 @@ class UserCreate extends FormRequest
             'name' => 'required',
             'username' => 'required|string|unique:users,username',
             'password' => 'required|confirmed',
-            'role' => ['required', new Enum(Role::class)],
+            'role' => ['nullable', new Enum(Role::class)],
         ];
     }
 }
