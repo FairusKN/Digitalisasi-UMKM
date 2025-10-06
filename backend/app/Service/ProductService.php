@@ -28,7 +28,6 @@ class ProductService
 
         if (isset($filters['category'])) {
             if (!ProductCategory::tryFrom($filters['category'])) {
-                // Throw an exception instead of returning a response
                 throw new InvalidArgumentException("Invalid category value: {$filters['category']}");
             }
             $query->where('category', $filters['category']);
