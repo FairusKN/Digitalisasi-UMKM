@@ -4,7 +4,7 @@ namespace App;
 
 enum ProductCategory: string
 {
-    case Drink = "drink";
+    case Food = "food";
     case Beverages = "beverages";
     case Snack = "snack";
 }
