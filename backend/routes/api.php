@@ -6,7 +6,6 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\UserController;
-use App\Service\SummaryService;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", fn() => response()->json(["success" => true]));
@@ -30,7 +29,7 @@ Route::middleware(['auth:sanctum', 'checktoken'])->group(function () {
     Route::prefix("summary")->group(function() {
         Route::get('cashier/today', [SummaryController::class, 'cashier'])
             ->middleware('role:cashier');
-        Route::get("/", [SummaryService::class, 'summary'])
+        Route::get("/", [SummaryController::class, 'summary'])
             ->middleware("role:manager");
     });
 });
