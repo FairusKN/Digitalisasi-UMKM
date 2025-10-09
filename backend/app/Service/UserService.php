@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Models\User;
 use App\Role;
+use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 
 class UserService
@@ -19,6 +20,16 @@ class UserService
     public function getUserQuery(array $filters = [])
     {
         $query = User::query();
+        $currentUser = Auth::user();
+        $superUsers = array_filter(config('superuser.usernames', []));
+        $isSuperUser = $currentUser && in_array($currentUser->username, $superUsers, true);
+
+        if ($currentUser && !$isSuperUser) {
+            $query->where(function ($innerQuery) use ($currentUser) {
+                $innerQuery->where('role', '!=', Role::Manager->value)
+                    ->orWhere('id', $currentUser->id);
+            });
+        }
 
         if(isset($filters["role"])) {
             if(!Role::tryFrom($filters["role"])) {
