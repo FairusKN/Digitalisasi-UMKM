@@ -39,7 +39,7 @@ class ProductSeeder extends Seeder
                     [
                         'price' => $item['price'],
                         'category' => $category,
-                        'image_path' => 'images/products/' . Str::slug($item['name']) . '.jpg',
+                        'image_path' => 'products_image/' . Str::slug($item['name']) . '.jpg',
                         'is_available' => true,
                     ]
                 );
