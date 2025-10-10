@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+
 # Digitalisasi UMKM
 
 A Cashier web-based app with Admin analytic dashboard init.
@@ -50,4 +52,3 @@ curl localhost/api
 ```bash
 ./scripts/database-migrate-fresh-seed.sh
 ```
-

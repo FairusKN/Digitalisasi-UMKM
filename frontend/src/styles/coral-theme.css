@@ -1,0 +1,78 @@
+:root {
+  --light-coral: #ef7674;
+  --bright-pink-crayola: #ec5766;
+  --amaranth: #da344d;
+  --crimson: #d91e36;
+  --cardinal: #c42348;
+  
+  --light-coral-10: rgba(239, 118, 116, 0.1);
+  --bright-pink-10: rgba(236, 87, 102, 0.1);
+  --amaranth-10: rgba(218, 52, 77, 0.1);
+  --crimson-10: rgba(217, 30, 54, 0.1);
+  --cardinal-10: rgba(196, 35, 72, 0.1);
+  
+  --light-coral-20: rgba(239, 118, 116, 0.2);
+  --bright-pink-20: rgba(236, 87, 102, 0.2);
+  --amaranth-20: rgba(218, 52, 77, 0.2);
+  --crimson-20: rgba(217, 30, 54, 0.2);
+  --cardinal-20: rgba(196, 35, 72, 0.2);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--bright-pink-crayola) 0%, var(--amaranth) 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--amaranth) 0%, var(--crimson) 100%);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, var(--crimson) 0%, var(--cardinal) 100%);
+}
+
+.gradient-primary:hover {
+  background: linear-gradient(135deg, var(--amaranth) 0%, var(--cardinal) 100%);
+}
+
+.gradient-secondary:hover {
+  background: linear-gradient(135deg, var(--cardinal) 0%, #991b30 100%);
+}
+
+.focus-coral:focus {
+  border-color: var(--bright-pink-crayola);
+  box-shadow: 0 0 0 2px var(--bright-pink-20);
+}
+
+.text-coral-primary { color: var(--crimson); }
+.text-coral-secondary { color: var(--amaranth); }
+.text-coral-accent { color: var(--cardinal); }
+
+.bg-coral-light { background-color: var(--light-coral-10); }
+.bg-coral-medium { background-color: var(--bright-pink-10); }
+.bg-coral-dark { background-color: var(--amaranth-10); }
+
+.btn-coral-primary {
+  background: linear-gradient(135deg, var(--bright-pink-crayola) 0%, var(--amaranth) 100%);
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-coral-primary:hover {
+  background: linear-gradient(135deg, var(--amaranth) 0%, var(--cardinal) 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-coral-secondary {
+  background: linear-gradient(135deg, var(--amaranth) 0%, var(--cardinal) 100%);
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-coral-secondary:hover {
+  background: linear-gradient(135deg, var(--cardinal) 0%, #991b30 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
