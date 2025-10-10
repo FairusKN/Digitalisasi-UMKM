@@ -54,7 +54,20 @@ const UserManagement = () => {
     return matchesSearch && matchesRole;
   });
 
-  const displayUsers = filteredUsers.filter(u => String(u.id) !== String(user?.id));
+  const displayUsers = filteredUsers.filter(u => {
+    if (String(u.id) === String(user?.id)) return false;
+    if (isSuperuser) {
+      const isUserSuperByApi = !!apiService.isSuperuserManager(u);
+      const roleStr = String((u as any).role || '').toLowerCase();
+      const isMarkedSuper = !!((u as any).is_superuser || (u as any).isSuperuser);
+      const isUserSuperFallback = roleStr.includes('super') || isMarkedSuper;
+
+      if (isUserSuperByApi || isUserSuperFallback) {
+        return false;
+      }
+    }
+    return true;
+  });
   const cashierCount = displayUsers.filter(u => u.role === 'cashier').length;
   const managerCount = displayUsers.filter(u => u.role === 'manager').length;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -381,7 +394,7 @@ const UserManagement = () => {
       }
       
       if (errorMessage.includes('Forbidden to manage user') || errorMessage.includes('role')) {
-        errorMessage = `Akses ditolak: Anda tidak memiliki izin untuk mengelola user dengan role "${formData.role}". \nHanya superuser manager (admin/owner) yang dapat mengelola semua role.`;
+        errorMessage = `Akses ditolak: Anda tidak memiliki izin untuk mengelola user dengan role "${formData.role}". \nHanya superuser manager (admin) yang dapat mengelola semua role.`;
       }
       
       await alert(errorMessage, 'error');
@@ -395,7 +408,7 @@ const UserManagement = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-3xl p-8 text-white relative overflow-hidden">
+          <div className="bg-blue-500 rounded-3xl p-8 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="relative z-10">
               <div className="flex items-center mb-4 justify-between">
@@ -494,9 +507,6 @@ const UserManagement = () => {
                           <div className="ml-2 text-xs">
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${userItem.role === 'manager' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{userItem.role === 'manager' ? 'Manager' : 'Kasir'}</span>
                           </div>
-                        </div>
-                        <div className="mt-2 text-xs text-gray-500">
-                          ID: <span className="font-mono">{String(userItem.id).slice(-8)}</span>
                         </div>
                       </div>
                     </div>
