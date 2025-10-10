@@ -263,7 +263,7 @@ class ApiService {
   }
 
   async getProduct(id: string): Promise<Product> {
-    const response = await this.api.get(`/manager/products/${id}`);
+    const response = await this.api.get(`/products/${id}`);
     return response.data.data || response.data;
   }
 
