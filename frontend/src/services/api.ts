@@ -603,8 +603,15 @@ class ApiService {
   }
 
   isSuperuserManager(user: User | null): boolean {
-    if (!user || user.role !== 'manager') return false;
-    const username = (user.username || '').toLowerCase();
+    if (!user) return false;
+
+    if ((user as any).is_superuser || (user as any).isSuperuser) return true;
+
+    const role = String(user.role || '').toLowerCase();
+    if (role !== 'manager') return false;
+
+    let username = String(user.username || '').toLowerCase().trim();
+    if (username.startsWith('@')) username = username.slice(1);
     return SUPERUSER_LIST.includes(username);
   }
 
