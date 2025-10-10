@@ -169,14 +169,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setIsAuthenticated(false);
         throw new Error('Username atau password salah');
       }
-    } catch (error) {
+    } catch (error: any) {
       setUser(null);
       setIsAuthenticated(false);
+      const status = error?.response?.status;
+      if (status === 400 || status === 401 || status === 422) {
+        throw new Error('Username Atau Password Yang Salah');
+      }
       if (error instanceof Error) {
         throw error;
-      } else {
-        throw new Error('Username atau password salah');
       }
+      throw new Error('Username atau password salah');
     }
   };
 
