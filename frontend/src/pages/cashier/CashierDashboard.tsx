@@ -269,21 +269,76 @@ const CashierDashboard: React.FC = () => {
     const paid = receipt.paidAmount || 0;
     const takeaway = receipt.takeaway ? 'Takeaway' : 'Makan di tempat';
 
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Struk</title>
-      <style>body{font-family:Arial,sans-serif;font-size:12px;padding:12px;color:#111}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #eee}</style>
-      </head><body>
-      <h3 style="color:#d91e36;margin:0 0 8px 0">Warung Pak Aceng</h3>
-      <div style="margin-bottom:8px">{}</div>
-      <table>${itemsHtml}</table>
-      <hr/>
-      <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:8px"><div>Total</div><div>${formatCurrency(receipt.total)}</div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px"><div>Metode</div><div>${getPaymentMethodDisplay(method)}</div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:2px"><div>Jenis Pesanan</div><div>${takeaway}</div></div>
-      ${method === 'cash' ? `<div style="display:flex;justify-content:space-between;margin-top:6px"><div>Dibayar</div><div>${formatCurrency(paid)}</div></div><div style="display:flex;justify-content:space-between;margin-top:2px"><div>Kembalian</div><div>${formatCurrency(paid - (receipt.total||0))}</div></div>` : ''}
-      ${receipt.note ? `<div style="margin-top:8px;background:#fffbe6;padding:8px;border-left:4px solid #fbbf24">Catatan: ${String(receipt.note)}</div>` : ''}
-      <div style="margin-top:12px;font-size:11px;color:#888">Dicetak oleh: ${user?.name || 'Kasir'}</div>
-      <script>window.onload=function(){setTimeout(()=>{window.print();},120);window.onafterprint=function(){window.close();}}</script>
-      </body></html>`;
+    const storeAddress = 'Jl. Cikutra No.67, Kecamatan Cibeunying Kaler';
+
+    const html = `<!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Struk</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <style>
+            @page { size: 80mm auto; margin: 0; }
+            html,body { margin:0; padding:0; }
+            body{
+              width:80mm;
+              max-width:80mm;
+              margin:0;
+              padding:6px 8px;
+              font-family: "Courier New", Courier, monospace;
+              font-size:12px;
+              color:#111;
+              -webkit-print-color-adjust: exact;
+            }
+            .center{ text-align:center; }
+            .header{ font-weight:700; font-size:13px; margin-bottom:2px; }
+            .address{ font-size:10px; color:#666; margin-bottom:6px; }
+            .section{ margin:4px 0; }
+            table{ width:100%; border-collapse:collapse; font-size:12px; }
+            td{ padding:3px 0; vertical-align:top; }
+            .right{ text-align:right; }
+            .dashed{ border-top:1px dashed #999; margin:6px 0; }
+            .bold{ font-weight:700; }
+            .note{ margin-top:6px; font-size:11px; }
+            .thankyou{ text-align:center; margin-top:8px; font-size:12px; font-weight:700; }
+            .meta{ font-size:10px; color:#666; }
+            @media print { body { padding:4mm; } }
+          </style>
+        </head>
+        <body>
+          <div class="center header">Warung Pak Aceng</div>
+          <div class="center address">${storeAddress}</div>
+
+          <div class="dashed"></div>
+
+          <div class="section"><div class="meta">Kasir: <span class="bold">${user?.name || 'Kasir'}</span></div></div>
+          <div class="section"><div class="meta">Customer: <span class="bold">${receipt.customerName || '-'}</span></div></div>
+
+          <div class="dashed"></div>
+
+          <div class="section">
+            <table>
+              ${itemsHtml}
+            </table>
+          </div>
+
+          <div class="dashed"></div>
+
+          <div style="display:flex;justify-content:space-between" class="section bold"><div>Total</div><div class="right">${formatCurrency(receipt.total)}</div></div>
+          <div style="display:flex;justify-content:space-between" class="section"><div>Metode</div><div class="right">${getPaymentMethodDisplay(method)}</div></div>
+          <div style="display:flex;justify-content:space-between" class="section"><div>Jenis</div><div class="right">${takeaway}</div></div>
+          ${method === 'cash' ? `<div style="display:flex;justify-content:space-between" class="section"><div>Dibayar</div><div class="right">${formatCurrency(paid)}</div></div><div style="display:flex;justify-content:space-between" class="section"><div>Kembalian</div><div class="right">${formatCurrency(paid - (receipt.total||0))}</div></div>` : ''}
+
+          ${receipt.note ? `<div class="note">Catatan: ${String(receipt.note)}</div>` : ''}
+
+          <div class="thankyou">Terima kasih sudah memesan</div>
+
+          <script>
+            window.onload = function(){ setTimeout(()=>{ window.print(); }, 120); };
+            window.onafterprint = function(){ try{ window.close(); } catch(e){} };
+          </script>
+        </body>
+      </html>`;
 
     const w = window.open('', '_blank', 'width=400,height=600');
     if (!w) { alert('Pop-up diblokir, izinkan pop-up untuk mencetak.'); return; }
@@ -311,7 +366,7 @@ const CashierDashboard: React.FC = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition-colors"
+                className="flex items-center space-x-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -323,7 +378,7 @@ const CashierDashboard: React.FC = () => {
               {user && (
                 <span>Login: <span className="font-medium text-gray-700">{user.name}</span></span>
               )}
-              <span>{new Date().toLocaleTimeString('id-ID')}</span>
+              <span>{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           </div>
 
@@ -348,18 +403,18 @@ const CashierDashboard: React.FC = () => {
                   })}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {new Date().toLocaleTimeString('id-ID')}
+                  {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Logout</span>
-              </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
             </div>
           </div>
         </div>
@@ -586,38 +641,19 @@ const CashierDashboard: React.FC = () => {
                       </label>
                       <input
                         type="number"
-                        value={paidAmount}
-                        onChange={(e) => setPaidAmount(Number(e.target.value))}
+                        value={paidAmount === 0 ? '' : paidAmount}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setPaidAmount(v === '' ? 0 : Number(v));
+                        }}
                         placeholder="Masukkan jumlah uang yang dibayar"
+                        min={0}
+                        step={1}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       />
                       {paidAmount > 0 && paidAmount < getTotalAmount() && (
                         <p className="mt-2 text-sm text-red-600">Jumlah dibayar harus lebih besar atau sama dengan total ({formatCurrency(getTotalAmount())})</p>
                       )}
-                    </div>
-                  )}
-
-                  {paymentMethod === 'debit' && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <div className="flex items-center text-blue-800">
-                        <span className="text-2xl mr-2">💳</span>
-                        <div>
-                          <p className="font-medium">Pembayaran Kartu Debit</p>
-                          <p className="text-sm text-blue-600">Pastikan kartu debit sudah siap untuk digesek</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'qris' && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <div className="flex items-center text-green-800">
-                        <span className="text-2xl mr-2">📱</span>
-                        <div>
-                          <p className="font-medium">Pembayaran QRIS</p>
-                          <p className="text-sm text-green-600">Scan QR Code dengan aplikasi pembayaran digital</p>
-                        </div>
-                      </div>
                     </div>
                   )}
 
@@ -713,29 +749,23 @@ const CashierDashboard: React.FC = () => {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-medium text-gray-700">Order ID</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700">No</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-700">Total</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-700">Pembayaran</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-700">Waktu</th>
                         
                       </tr>
                     </thead>
                   <tbody>
-                    {orders.map(order => (
+                    {orders.map((order, idx) => (
                       <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-3 px-4 font-mono text-sm">#{order.id}</td>
+                        <td className="py-3 px-4 font-mono text-sm">No. #{idx + 1}</td>
                         <td className="py-3 px-4 font-semibold" style={{color: '#d91e36'}}>
                           {formatCurrency(order.totalAmount)}
                         </td>
                         <td className="py-3 px-4">{getPaymentMethodDisplay(order.metadata?.paymentMethod || 'cash')}</td>
-                        <td className="py-3 px-4">
-                          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                            Selesai
-                          </span>
-                        </td>
                         <td className="py-3 px-4 text-sm text-gray-500">
-                          {new Date().toLocaleTimeString('id-ID')}
+                          {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
                     ))}
@@ -744,34 +774,29 @@ const CashierDashboard: React.FC = () => {
               </div>
 
                 <div className="lg:hidden space-y-3">
-                  {orders.map(order => (
-                    <div key={order.id} className="bg-gray-50 rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-mono text-xs text-gray-600">#{order.id}</p>
-                          <p className="text-xs text-gray-500">{new Date().toLocaleTimeString('id-ID')}</p>
+                  {orders.map((order, idx) => (
+                    <div key={order.id} className="bg-gray-50 rounded-lg p-4 space-y-3 overflow-hidden">
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="min-w-0">
+                          <p className="font-mono text-xs text-gray-600 break-words whitespace-normal">No. #{idx + 1}</p>
+                          <p className="text-xs text-gray-500">{new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
-                        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                          Selesai
-                        </span>
                       </div>
                       
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <div>
+                        <div className="flex justify-between items-center gap-3">
+                          <div className="min-w-0">
                             <p className="text-xs text-gray-500">Total:</p>
-                            <p className="font-semibold text-sm" style={{color: '#d91e36'}}>
+                            <p className="font-semibold text-sm truncate" style={{color: '#d91e36'}}>
                               {formatCurrency(order.totalAmount)}
                             </p>
                           </div>
-                          <div>
+                          <div className="min-w-0 text-right">
                             <p className="text-xs text-gray-500 mb-1">Pembayaran:</p>
-                            <p className="text-xs">{getPaymentMethodDisplay(order.metadata?.paymentMethod || 'cash')}</p>
+                            <p className="text-xs truncate">{getPaymentMethodDisplay(order.metadata?.paymentMethod || 'cash')}</p>
                           </div>
                         </div>
                       </div>
-                      
-                      
                     </div>
                   ))}
                 </div>
@@ -801,6 +826,7 @@ const CashierDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
       {showReceiptModal && lastReceipt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 border border-gray-200">
