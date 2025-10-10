@@ -47,6 +47,7 @@ class SummaryService
                 'takeaway' => 0,
                 'dine_in' => 0,
             ],
+            "total_income" => 0,
             'total_order' => $orders->count(),
         ];
 
@@ -55,6 +56,7 @@ class SummaryService
             $summary['total_based_on_customer_preferences'][
                 $order->is_takeaway ? 'takeaway' : 'dine_in'
             ]++;
+            $summary["total_income"] += $order->total;
 
             // Payment Method
             $paymentMethod = strtolower($order->payment_method);
