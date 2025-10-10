@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import ManagerDashboard from './pages/manager/ManagerDashboard';
@@ -78,6 +79,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           
           <Route path="/system" element={<RoleBasedRedirect />} />

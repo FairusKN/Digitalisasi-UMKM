@@ -234,12 +234,6 @@ export const AlertContainer: React.FC = () => {
                 <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{alert.message}</p>
                 <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                   <button
-                    onClick={alert.onCancel}
-                    className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
-                  >
-                    {alert.cancelText || 'Batal'}
-                  </button>
-                  <button
                     onClick={alert.onConfirm}
                     className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 cursor-pointer"
                     style={{ background: 'linear-gradient(135deg, #ec5766 0%, #da344d 100%)' }}
@@ -251,6 +245,12 @@ export const AlertContainer: React.FC = () => {
                     }}
                   >
                     {alert.confirmText || 'Ya'}
+                  </button>
+                  <button
+                    onClick={alert.onCancel}
+                    className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                  >
+                    {alert.cancelText || 'Batal'}
                   </button>
                 </div>
               </div>

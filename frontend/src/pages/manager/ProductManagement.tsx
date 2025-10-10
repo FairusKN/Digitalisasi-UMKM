@@ -44,7 +44,9 @@ const ProductManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };  const formatCurrency = (amount: number) => {
+  };
+
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
@@ -53,14 +55,14 @@ const ProductManagement = () => {
     }).format(amount);
   };
 
-    const formatCategory = (cat?: string) => {
-      if (!cat) return 'Tanpa Kategori';
-      const key = cat.toLowerCase();
-      if (key === 'food') return 'Makanan';
-      if (key === 'beverages') return 'Minuman';
-      if (key === 'snack' || key === 'snacks') return 'Snack';
-      return cat;
-    };
+  const formatCategory = (cat?: string) => {
+    if (!cat) return 'Tanpa Kategori';
+    const key = cat.toLowerCase();
+    if (key === 'food') return 'Makanan';
+    if (key === 'beverages') return 'Minuman';
+    if (key === 'snack' || key === 'snacks') return 'Snack';
+    return cat;
+  };
 
   const filteredProducts = Array.isArray(products)
     ? products.filter(product => {
@@ -378,7 +380,7 @@ const ProductManagement = () => {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Kelola Produk</h1>
               <p className="text-lg opacity-90">Atur menu dan produk warung Anda dengan mudah</p>
               <div className="mt-6 flex flex-col gap-4">
-                <div className="w-full flex flex-col sm:flex-row gap-2 items-center">
+                <div className="w-full">
                   <input
                     type="text"
                     placeholder="Cari produk berdasarkan nama atau kategori..."
@@ -386,27 +388,65 @@ const ProductManagement = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-2xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/30 transition-all"
                   />
-                  <div className="flex gap-2 mt-2 sm:mt-0">
-                    <button
-                      type="button"
-                      onClick={() => setCategoryFilter('all')}
-                      className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 shadow-sm ${categoryFilter === 'all' ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'} border-0`}
-                    >Semua</button>
-                    <button
-                      type="button"
-                      onClick={() => setCategoryFilter('food')}
-                      className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 shadow-sm ${categoryFilter === 'food' ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'} border-0`}
-                    >Makanan</button>
-                    <button
-                      type="button"
-                      onClick={() => setCategoryFilter('beverages')}
-                      className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 shadow-sm ${categoryFilter === 'beverages' ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'} border-0`}
-                    >Minuman</button>
-                    <button
-                      type="button"
-                      onClick={() => setCategoryFilter('snack')}
-                      className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 shadow-sm ${categoryFilter === 'snack' ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'} border-0`}
-                    >Snack</button>
+                </div>
+                
+                <div className="w-full">
+                  <div className="overflow-x-auto overflow-y-hidden pb-2" style={{ 
+                    WebkitOverflowScrolling: 'touch',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}>
+                    <style>{`
+                      .filter-scroll::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}</style>
+                    <div className="flex gap-2 min-w-max filter-scroll">
+                      <button
+                        type="button"
+                        onClick={() => setCategoryFilter('all')}
+                        className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold transition-all duration-200 shadow-sm whitespace-nowrap ${
+                          categoryFilter === 'all' 
+                            ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' 
+                            : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'
+                        } border-0`}
+                      >
+                        Semua
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryFilter('food')}
+                        className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold transition-all duration-200 shadow-sm whitespace-nowrap ${
+                          categoryFilter === 'food' 
+                            ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' 
+                            : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'
+                        } border-0`}
+                      >
+                        Makanan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryFilter('beverages')}
+                        className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold transition-all duration-200 shadow-sm whitespace-nowrap ${
+                          categoryFilter === 'beverages' 
+                            ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' 
+                            : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'
+                        } border-0`}
+                      >
+                        Minuman
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryFilter('snack')}
+                        className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold transition-all duration-200 shadow-sm whitespace-nowrap ${
+                          categoryFilter === 'snack' 
+                            ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg scale-105' 
+                            : 'bg-white text-red-700 hover:bg-red-50 hover:scale-105'
+                        } border-0`}
+                      >
+                        Snack
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -414,11 +454,10 @@ const ProductManagement = () => {
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 -mx-4 sm:mx-0">
+          <div className="flex items-center justify-between mb-6 px-4 sm:px-0">
             <div className="flex items-center space-x-3">
-                <span className="text-white text-xl">📊</span>
+              <span className="text-xl">📊</span>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Produk Tersedia</h2>
                 <p className="text-gray-500">{filteredProducts.length} item ditemukan</p>
@@ -427,7 +466,7 @@ const ProductManagement = () => {
           </div>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-0">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 animate-pulse">
                   <div className="w-full h-48 bg-gray-200 rounded-xl mb-4"></div>
@@ -437,74 +476,72 @@ const ProductManagement = () => {
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="text-center py-16 px-4 sm:px-0">
               <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                 <span className="text-4xl">📦</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Belum ada produk</h3>
               <p className="text-gray-500 mb-6">Mulai tambahkan produk untuk warung Anda</p>
+              <Button onClick={handleAddProduct}>
+                + Tambah Produk Pertama
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-0">
               {filteredProducts.map((product) => {
                 const imageUrl = getImageUrl(product.image);
                 return (
-                <div key={product.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-red-200">
-                  {/* Product Image */}
-                  <div className="relative h-48 overflow-hidden bg-gray-100">
-                    {imageUrl ? (
-                      <img 
-                        src={imageUrl} 
-                        alt={product.name || 'Produk'}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <span className="text-6xl">📦</span>
+                  <div key={product.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-red-200">
+                    <div className="relative h-48 overflow-hidden bg-gray-100">
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={product.name || 'Produk'}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <span className="text-6xl">📦</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    </div>                  
+                    <div className="p-5">
+                      <div className="mb-3">
+                        <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1">{product.name || 'Nama Produk'}</h3>
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  </div>                  
-                  {/* Product Info */}
-                  <div className="p-5">
-                    <div className="mb-3">
-                      <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1">{product.name || 'Nama Produk'}</h3>
-                    </div>
 
-                    {/* Category */}
-                    <div className="mb-3">
-                      <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white" style={{
-                        background: 'linear-gradient(135deg, #ec5766 0%, #da344d 100%)'
-                      }}>
-                        <span className="mr-1">🏷️</span>
-                        {formatCategory(product.category)}
-                      </span>
-                    </div>
-                    
-                    {/* Price */}
-                    <div className="mb-4">
-                      <p className="text-2xl font-bold text-gray-900">
-                        {formatCurrency(Number(product.price) || 0)}
-                      </p>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="flex-1 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium text-sm"
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product)}
-                        className="px-4 py-2 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
-                      >
-                        🗑️
-                      </button>
+                      <div className="mb-3">
+                        <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white" style={{
+                          background: 'linear-gradient(135deg, #ec5766 0%, #da344d 100%)'
+                        }}>
+                          <span className="mr-1">🏷️</span>
+                          {formatCategory(product.category)}
+                        </span>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <p className="text-2xl font-bold text-gray-900">
+                          {formatCurrency(Number(product.price) || 0)}
+                        </p>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="flex-1 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium text-sm"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product)}
+                          className="px-4 py-2 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
                 );
               })}
             </div>
@@ -604,7 +641,6 @@ const ProductManagement = () => {
                     </option>
                   </select>
                   
-                  {/* Custom select indicator overlay */}
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -612,7 +648,6 @@ const ProductManagement = () => {
                   </div>
                 </div>
                 
-                {/* Category preview */}
                 {formData.category && (
                   <div className="mt-2 flex items-center space-x-2">
                     <span className="text-xs text-gray-500">Kategori terpilih:</span>

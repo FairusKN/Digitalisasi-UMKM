@@ -56,6 +56,7 @@ const UserManagement = () => {
 
   const displayUsers = filteredUsers.filter(u => String(u.id) !== String(user?.id));
   const cashierCount = displayUsers.filter(u => u.role === 'cashier').length;
+  const managerCount = displayUsers.filter(u => u.role === 'manager').length;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage] = useState<number>(9);
   const totalPages = Math.max(1, Math.ceil(displayUsers.length / perPage));
@@ -440,6 +441,12 @@ const UserManagement = () => {
                   <div className="text-2xl font-bold">{cashierCount}</div>
                   <div className="text-sm opacity-90">Kasir</div>
                 </div>
+                {isSuperuser && (
+                  <div className="bg-white/10 rounded-2xl p-4">
+                    <div className="text-2xl font-bold">{managerCount}</div>
+                    <div className="text-sm opacity-90">Manager</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
