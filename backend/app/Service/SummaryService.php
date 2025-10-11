@@ -19,11 +19,12 @@ class SummaryService
     public function getOrder(array $filters)
     {
         if (
-            (!empty($filters["start_date"]) || !empty($filters["end_date"]))
+            (!empty($filters["start_date"]) && empty($filters["end_date"])) ||
+            (empty($filters["start_date"]) && !empty($filters["end_date"]))
         ) {
-            throw new ValidationException(
-                __("Pilih salah satu: period atau custom date")
-            );
+            throw ValidationException::withMessages([
+                'date' => 'Harap isi keduanya: start_date dan end_date',
+            ]);
         }
 
         $query = Order::query();
