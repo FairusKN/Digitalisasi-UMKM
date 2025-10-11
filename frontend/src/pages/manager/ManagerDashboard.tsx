@@ -81,6 +81,7 @@ const ManagerDashboard = () => {
   const [categoryData, setCategoryData] = useState<Record<string, number>>({});
   const [itemsByCategory, setItemsByCategory] = useState<Record<string, Record<string, number>>>({});
   const [selectedDetailCategory, setSelectedDetailCategory] = useState<string>('');
+  const [revenueData, setRevenueData] = useState<Record<string, number>>({});
 
   useEffect(() => {
     loadSummary();
@@ -104,14 +105,32 @@ const ManagerDashboard = () => {
         productCount = 0;
       }
       setStats({
-        totalRevenue: data.total_revenue || 0,
+        totalRevenue: Number(data.total_income ?? data.total_revenue ?? 0),
         totalOrders: data.total_order || 0,
         totalProducts: productCount
       });
+      let revMap: Record<string, number> = {};
+      if (data.total_income_by_day && typeof data.total_income_by_day === 'object') {
+        revMap = data.total_income_by_day;
+      } else if (data.total_based_on_date && typeof data.total_based_on_date === 'object') {
+        revMap = data.total_based_on_date;
+      } else if (data.total_based_on_day && typeof data.total_based_on_day === 'object') {
+        revMap = data.total_based_on_day;
+      } else {
+        for (const [k, v] of Object.entries(data || {})) {
+          if (v && typeof v === 'object' && /income|pendapatan|total/i.test(k)) {
+            revMap = v as Record<string, number>;
+            break;
+          }
+        }
+      }
+      if (Object.keys(revMap).length === 0 && (data.total_income || data.total_revenue)) {
+        const firstLabel = periodInfo.days && periodInfo.days.length ? periodInfo.days[0].label : 'Total';
+        revMap = { [firstLabel]: Number(data.total_income ?? data.total_revenue ?? 0) };
+      }
+      setRevenueData(revMap);
       if (!selectedDetailCategory) {
-        const firstCat = (Object.keys(data.total_items || {}).filter(k => isCategoryKeyValid(k))[0])
-          || (Object.keys(data.total_based_on_product_category || {}).filter(k => isCategoryKeyValid(k))[0])
-          || '';
+        const firstCat = Object.keys(data.total_items || {})[0] || Object.keys(data.total_based_on_product_category || {})[0] || '';
         setSelectedDetailCategory(firstCat);
       }
     } catch (e) {
@@ -130,9 +149,9 @@ const ManagerDashboard = () => {
     setTimeout(() => setIsLoading(false), 500);
   }, [stats]);
 
-  const revenueChartData = periodInfo.days.map((day) => ({
+  const revenueChartData = periodInfo.days.map((day, idx) => ({
     name: day.label,
-    pendapatan: 0 
+    pendapatan: Number(revenueData[day.label] ?? (idx === 0 ? stats.totalRevenue : 0))
   }));
 
   const categoryChartData = selectedDetailCategory && itemsByCategory[selectedDetailCategory]
@@ -153,11 +172,6 @@ const ManagerDashboard = () => {
       'snack': 'Snack'
     };
     return categoryMap[cat.toLowerCase()] || cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ');
-  };
-
-  const isCategoryKeyValid = (k: string) => {
-    if (!k) return false;
-    return !/^total/i.test(k);
   };
 
   const CustomRevenueTooltip = ({ active, payload }: any) => {
@@ -336,10 +350,10 @@ const ManagerDashboard = () => {
                 >
                   <option value="">-- Pilih Kategori --</option>
                   {Object.keys(itemsByCategory || {}).length > 0 
-                    ? Object.keys(itemsByCategory).filter(k => isCategoryKeyValid(k)).map(c => (
+                    ? Object.keys(itemsByCategory).map(c => (
                         <option key={c} value={c}>{formatCategoryName(c)}</option>
                       ))
-                    : Object.keys(categoryData || {}).filter(k => isCategoryKeyValid(k)).map(c => (
+                    : Object.keys(categoryData || {}).map(c => (
                         <option key={c} value={c}>{formatCategoryName(c)}</option>
                       ))
                   }
