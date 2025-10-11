@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
 import apiService from '../../services/api';
 import ManagerNavbar from '../../components/layout/ManagerNavbar';
@@ -108,7 +109,9 @@ const ManagerDashboard = () => {
         totalProducts: productCount
       });
       if (!selectedDetailCategory) {
-        const firstCat = Object.keys(data.total_items || {})[0] || Object.keys(data.total_based_on_product_category || {})[0] || '';
+        const firstCat = (Object.keys(data.total_items || {}).filter(k => isCategoryKeyValid(k))[0])
+          || (Object.keys(data.total_based_on_product_category || {}).filter(k => isCategoryKeyValid(k))[0])
+          || '';
         setSelectedDetailCategory(firstCat);
       }
     } catch (e) {
@@ -126,6 +129,64 @@ const ManagerDashboard = () => {
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500);
   }, [stats]);
+
+  const revenueChartData = periodInfo.days.map((day) => ({
+    name: day.label,
+    pendapatan: 0 
+  }));
+
+  const categoryChartData = selectedDetailCategory && itemsByCategory[selectedDetailCategory]
+    ? Object.entries(itemsByCategory[selectedDetailCategory] || {})
+        .sort((a, b) => Number(b[1]) - Number(a[1]))
+        .slice(0, 7)
+        .map(([itemName, qty]) => ({
+          name: itemName.length > 10 ? itemName.substring(0, 10) + '...' : itemName,
+          fullName: itemName,
+          terjual: Number(qty)
+        }))
+    : [];
+
+  const formatCategoryName = (cat: string) => {
+    const categoryMap: Record<string, string> = {
+      'food': 'Makanan',
+      'beverages': 'Minuman',
+      'snack': 'Snack'
+    };
+    return categoryMap[cat.toLowerCase()] || cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ');
+  };
+
+  const isCategoryKeyValid = (k: string) => {
+    if (!k) return false;
+    return !/^total/i.test(k);
+  };
+
+  const CustomRevenueTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="text-sm font-semibold text-gray-900">{payload[0].payload.name}</p>
+          <p className="text-sm text-orange-600">
+            Pendapatan: Rp {payload[0].value.toLocaleString('id-ID')}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomCategoryTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="text-sm font-semibold text-gray-900">{payload[0].payload.fullName}</p>
+          <p className="text-sm text-orange-600">
+            Terjual: {payload[0].value}x
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (isLoading) {
     return (
@@ -176,7 +237,7 @@ const ManagerDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
@@ -214,8 +275,6 @@ const ManagerDashboard = () => {
               </div>
             </div>
           </div>
-
-          {/* Total Pelanggan card removed - using product count instead */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -229,35 +288,30 @@ const ManagerDashboard = () => {
                   <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
                   <span className="text-gray-600">Pendapatan</span>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-orange-200 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Target</span>
-                </div>
               </div>
               
-              <div className="h-48 flex items-end justify-between space-x-2 rounded-lg p-4">
-                {periodInfo.days.map((day, index) => (
-                  <div key={index} className="flex flex-col items-center flex-1">
-            <div className="w-full max-w-12 h-32 rounded-t-md relative flex flex-col justify-end overflow-hidden">
-              <div className="absolute bottom-0 w-full bg-orange-200 rounded-t-md" style={{height: '100%'}}></div>
-              <div className="absolute bottom-0 w-full bg-orange-500 rounded-t-md transition-all duration-500" style={{height: '0%'}}></div>
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                        <span className="text-xs font-medium text-gray-600 bg-white px-1 py-0.5 rounded shadow-sm whitespace-nowrap">
-                          Rp 0
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-xs font-medium text-gray-600 text-center">
-                      {day.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={revenueChartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickFormatter={(value) => `${(value / 1000)}k`}
+                  />
+                  <Tooltip content={<CustomRevenueTooltip />} />
+                  <Bar dataKey="pendapatan" fill="#f97316" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
               
               <div className="mt-4 p-3 bg-orange-50 rounded-lg">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-orange-700 font-medium">Total Hari Ini:</span>
-                  <span className="text-orange-800 font-semibold">{periodInfo.summary}</span>
+                  <span className="text-orange-700 font-medium">Total:</span>
+                  <span className="text-orange-800 font-semibold">Rp {stats.totalRevenue.toLocaleString('id-ID')}</span>
                 </div>
               </div>
             </div>
@@ -281,18 +335,27 @@ const ManagerDashboard = () => {
                   }}
                 >
                   <option value="">-- Pilih Kategori --</option>
-                  {Object.keys(categoryData).map(c => (
-                    <option key={c} value={c}>{c.replace(/_/g, ' ').charAt(0).toUpperCase() + c.replace(/_/g, ' ').slice(1)}</option>
-                  ))}
+                  {Object.keys(itemsByCategory || {}).length > 0 
+                    ? Object.keys(itemsByCategory).filter(k => isCategoryKeyValid(k)).map(c => (
+                        <option key={c} value={c}>{formatCategoryName(c)}</option>
+                      ))
+                    : Object.keys(categoryData || {}).filter(k => isCategoryKeyValid(k)).map(c => (
+                        <option key={c} value={c}>{formatCategoryName(c)}</option>
+                      ))
+                  }
                 </select>
               </div>
             </div>
 
-            {(!selectedDetailCategory || !itemsByCategory || Object.keys(itemsByCategory || {}).length === 0) ? (
+            {(!selectedDetailCategory || !itemsByCategory || Object.keys(itemsByCategory || {}).length === 0 || !itemsByCategory[selectedDetailCategory]) ? (
               <div className="flex items-center justify-center h-64 text-gray-500">
                 <div className="text-center">
                   <div className="text-4xl mb-2">📊</div>
-                  <p>Pilih kategori untuk melihat detail item</p>
+                  <p>
+                    {Object.keys(itemsByCategory || {}).length === 0 
+                      ? 'Tidak ada data kategori tersedia' 
+                      : 'Pilih kategori untuk melihat detail item'}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -304,31 +367,25 @@ const ManagerDashboard = () => {
                   </div>
                 </div>
                 
-                <div className="h-48 flex items-end justify-between space-x-2 rounded-lg p-4">
-                  {Object.entries(itemsByCategory[selectedDetailCategory] || {})
-                    .sort((a, b) => Number(b[1]) - Number(a[1]))
-                    .slice(0, 7)
-                    .map(([itemName, qty]) => {
-                      const max = Math.max(...Object.values(itemsByCategory[selectedDetailCategory] || {}).map(n => Number(n)), 1);
-                      const heightPercent = Math.round((Number(qty) / max) * 100);
-                      
-                      return (
-                        <div key={itemName} className="flex flex-col items-center flex-1">
-                          <div className="w-full max-w-12 h-32 rounded-t-md relative flex flex-col justify-end overflow-hidden">
-                            <div className="absolute bottom-0 w-full bg-orange-500 rounded-t-md transition-all duration-500" style={{height: `${heightPercent}%`}}></div>
-                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                              <span className="text-xs font-medium text-gray-600 bg-white px-1 py-0.5 rounded shadow-sm whitespace-nowrap">
-                                {qty}x
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mt-2 text-xs font-medium text-gray-600 text-center truncate w-full" title={itemName}>
-                            {itemName.length > 10 ? itemName.substring(0, 10) + '...' : itemName}
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={categoryChartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fill: '#6b7280', fontSize: 11 }}
+                      axisLine={{ stroke: '#e5e7eb' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#6b7280', fontSize: 12 }}
+                      axisLine={{ stroke: '#e5e7eb' }}
+                    />
+                    <Tooltip content={<CustomCategoryTooltip />} />
+                    <Bar dataKey="terjual" fill="#f97316" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
                 
                 <div className="mt-4 p-3 bg-orange-50 rounded-lg">
                   <div className="flex justify-between items-center text-sm">
