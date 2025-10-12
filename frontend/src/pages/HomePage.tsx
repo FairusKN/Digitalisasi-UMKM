@@ -15,7 +15,6 @@ const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   
   const heroAnimation = useScrollAnimation({ threshold: 0.1 });
-  const coffeeAnimation = useScrollAnimation({ threshold: 0.2 });
   const coffeeLeftAnimation = useScrollAnimation({ threshold: 0.2 });
   const coffeeRightAnimation = useScrollAnimation({ threshold: 0.2 });
   const featuresAnimation = useScrollAnimation({ threshold: 0.2 });
@@ -101,61 +100,48 @@ const HomePage = () => {
 
       <section className="py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ScrollAnimatedSection 
-            ref={coffeeAnimation.ref}
-            isVisible={coffeeAnimation.isVisible}
-            animation="fadeInUp"
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight" style={{color: '#da344d',fontFamily: 'Inter, sans-serif'}}>
-              KETIKA BERBICARA TENTANG MAKANAN, KAMI<br/>
-              TAHU APA YANG KAMI MASAK.
-            </h2>
-          </ScrollAnimatedSection>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <ScrollAnimatedSection 
-              ref={coffeeLeftAnimation.ref}
-              isVisible={coffeeLeftAnimation.isVisible}
-              animation="fadeInLeft"
-              delay={100}
-              className="relative"
-            >
-              <div className="bg-gradient-to-br from-orange-200 to-red-200 rounded-2xl p-8 text-center">
-                <div className="mb-6">
-                  <div className="w-48 h-48 mx-auto bg-gradient-to-br from-orange-300 to-red-300 rounded-lg flex items-center justify-center text-6xl mb-6">
-                    🍛
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2" style={{fontFamily: 'Inter, sans-serif'}}>Nasi Goreng Special</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed" style={{fontFamily: 'Inter, sans-serif'}}>
-                  Nasi goreng spesial dengan bumbu rahasia dan tambahan ayam crispy, disajikan dengan telur mata sapi.
-                </p>
+          <ScrollAnimatedSection
+            ref={coffeeLeftAnimation.ref}
+            isVisible={coffeeLeftAnimation.isVisible}
+            animation="fadeInLeft"
+            delay={100}
+            className="relative"
+          >
+            <div className="bg-gradient-to-br from-orange-200 to-red-200 rounded-2xl p-8 text-center">
+            <div className="mb-6">
+              <div className="w-48 h-48 mx-auto bg-gradient-to-br from-orange-300 to-red-300 rounded-lg flex items-center justify-center text-6xl mb-6">
+              👨‍🍳
               </div>
-            </ScrollAnimatedSection>
-
-            <ScrollAnimatedSection 
-              ref={coffeeRightAnimation.ref}
-              isVisible={coffeeRightAnimation.isVisible}
-              animation="fadeInRight"
-              delay={200}
-              className="relative"
-            >
-              <div className="bg-gradient-to-br from-yellow-100 to-orange-200 rounded-2xl p-8 text-center">
-                <div className="mb-6">
-                  <div className="w-48 h-48 mx-auto bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg flex items-center justify-center text-6xl mb-6">
-                    🍹
-                  </div>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2" style={{fontFamily: 'Inter, sans-serif'}}>Es Teh Manis</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed" style={{fontFamily: 'Inter, sans-serif'}}>
-                  Minuman segar khas warung dengan rasa teh yang kuat dan manis yang pas. Perpaduan sempurna untuk menemani santap siang Anda.
-                </p>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2" style={{fontFamily: 'Inter, sans-serif'}}>Cita Rasa Autentik</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed" style={{fontFamily: 'Inter, sans-serif'}}>
+              Setiap hidangan diolah dengan resep turun-temurun dan bumbu pilihan. Kami berkomitmen menghadirkan cita rasa khas yang membuat Anda ingin kembali lagi.
+            </p>
+            </div>
+          </ScrollAnimatedSection>
+          <ScrollAnimatedSection
+            ref={coffeeRightAnimation.ref}
+            isVisible={coffeeRightAnimation.isVisible}
+            animation="fadeInRight"
+            delay={200}
+            className="relative"
+          >
+            <div className="bg-gradient-to-br from-yellow-100 to-orange-200 rounded-2xl p-8 text-center">
+            <div className="mb-6">
+              <div className="w-48 h-48 mx-auto bg-gradient-to-br from-yellow-200 to-orange-300 rounded-lg flex items-center justify-center text-6xl mb-6">
+              🏠
               </div>
-            </ScrollAnimatedSection>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2" style={{fontFamily: 'Inter, sans-serif'}}>Suasana Nyaman & Ramah</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed" style={{fontFamily: 'Inter, sans-serif'}}>
+              Nikmati pengalaman bersantap yang hangat dan akrab seperti di rumah sendiri. Pelayanan ramah kami siap membuat kunjungan Anda berkesan.
+            </p>
+            </div>
+          </ScrollAnimatedSection>
           </div>
         </div>
-      </section>
+        </section>
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

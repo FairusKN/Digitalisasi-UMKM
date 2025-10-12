@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
 import apiService from '../../services/api';
 import ManagerNavbar from '../../components/layout/ManagerNavbar';
@@ -7,7 +8,6 @@ const ManagerDashboard = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('today');
-
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -15,86 +15,90 @@ const ManagerDashboard = () => {
   });
   const [paymentStats, setPaymentStats] = useState<Record<string, number>>({});
   const [customerPrefs, setCustomerPrefs] = useState<{ takeaway: number; dine_in: number }>({ takeaway: 0, dine_in: 0 });
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [itemsByCategory, setItemsByCategory] = useState<Record<string, Record<string, number>>>({});
+  const [selectedDetailCategory, setSelectedDetailCategory] = useState<string>('food');
 
-  const getPeriodInfo = () => {
-    switch (selectedPeriod) {
-      case 'today':
-        return {
-          title: 'Pendapatan Hari Ini',
-          days: [{ label: 'Sekarang' }],
-          summary: 'Total Hari Ini',
-          comparison: 'dari kemarin'
-        };
-      case 'week':
-        return {
-          title: 'Pendapatan Mingguan',
-          days: [
-            { label: 'Sen' },
-            { label: 'Sel' },
-            { label: 'Rab' },
-            { label: 'Kam' },
-            { label: 'Jum' },
-            { label: 'Sab' },
-            { label: 'Min' }
-          ],
-          summary: 'Total Minggu Ini',
-          comparison: 'dari minggu lalu'
-        };
-      case 'month':
-        return {
-          title: 'Pendapatan Bulanan',
-          days: [
-            { label: 'Minggu 1' },
-            { label: 'Minggu 2' },
-            { label: 'Minggu 3' },
-            { label: 'Minggu 4' }
-          ],
-          summary: 'Total Bulan Ini',
-          comparison: 'dari bulan lalu'
-        };
-      case 'year':
-        return {
-          title: 'Pendapatan Tahunan',
-          days: [
-            { label: 'Q1' },
-            { label: 'Q2' },
-            { label: 'Q3' },
-            { label: 'Q4' }
-          ],
-          summary: 'Total Tahun Ini',
-          comparison: 'dari tahun lalu'
-        };
-      default:
-        return {
-          title: 'Pendapatan Hari Ini',
-          days: [{ label: 'Sekarang' }],
-          summary: 'Total Hari Ini',
-          comparison: 'dari kemarin'
-        };
-    }
+  const isoDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   };
 
-  const periodInfo = getPeriodInfo();
-  const [startDate, _setStartDate] = useState<string>('');
-  const [endDate, _setEndDate] = useState<string>('');
-  const [categoryData, setCategoryData] = useState<Record<string, number>>({});
-  const [itemsByCategory, setItemsByCategory] = useState<Record<string, Record<string, number>>>({});
-  const [selectedDetailCategory, setSelectedDetailCategory] = useState<string>('');
+  const startOfToday = () => isoDate(new Date());
+  
+  const startOfWeek = (date = new Date()) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    d.setDate(d.getDate() - day);
+    return isoDate(d);
+  };
+  
+  const endOfWeek = (date = new Date()) => {
+    const start = new Date(startOfWeek(date));
+    start.setDate(start.getDate() + 7);
+    return isoDate(start);
+  };
+  
+  const startOfMonth = (date = new Date()) => {
+    const d = new Date(date.getFullYear(), date.getMonth(), 1);
+    return isoDate(d);
+  };
+  
+  const endOfMonth = (date = new Date()) => {
+    const d = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    return isoDate(d);
+  };
+  
+  const startOfYear = (date = new Date()) => isoDate(new Date(date.getFullYear(), 0, 1));
+  const endOfYear = (date = new Date()) => isoDate(new Date(date.getFullYear(), 11, 31));
 
   useEffect(() => {
-    loadSummary();
-  }, [selectedPeriod, startDate, endDate]);
+    switch (selectedPeriod) {
+      case 'today':
+        setStartDate(startOfToday());
+        setEndDate(startOfToday());
+        break;
+      case 'week':
+        setStartDate(startOfWeek());
+        setEndDate(endOfWeek());
+        break;
+      case 'month':
+        setStartDate(startOfMonth());
+        setEndDate(endOfMonth());
+        break;
+      case 'year':
+        setStartDate(startOfYear());
+        setEndDate(endOfYear());
+        break;
+      default:
+        setStartDate(startOfToday());
+        setEndDate(startOfToday());
+    }
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      loadSummary();
+    }
+  }, [startDate, endDate]);
 
   const loadSummary = async () => {
+    if ((selectedPeriod === 'today' || selectedPeriod === 'week' || selectedPeriod === 'month' || selectedPeriod === 'year') && (!startDate || !endDate)) {
+      return;
+    }
+
     try {
       const filters: any = {};
       if (startDate) filters.start_date = startDate;
       if (endDate) filters.end_date = endDate;
       const data = await apiService.getSummary(filters);
-      setCategoryData(data.total_based_on_product_category || {});
       setItemsByCategory(data.total_items || {});
       setPaymentStats(data.total_based_on_payment_method || {});
       setCustomerPrefs(data.total_based_on_customer_preferences || { takeaway: 0, dine_in: 0 });
+      
       let productCount = 0;
       try {
         const products = await apiService.getProducts();
@@ -102,17 +106,13 @@ const ManagerDashboard = () => {
       } catch (e) {
         productCount = 0;
       }
+      
       setStats({
-        totalRevenue: data.total_revenue || 0,
+        totalRevenue: Number(data.total_income ?? data.total_revenue ?? 0),
         totalOrders: data.total_order || 0,
         totalProducts: productCount
       });
-      if (!selectedDetailCategory) {
-        const firstCat = Object.keys(data.total_items || {})[0] || Object.keys(data.total_based_on_product_category || {})[0] || '';
-        setSelectedDetailCategory(firstCat);
-      }
     } catch (e) {
-      setCategoryData({});
       setPaymentStats({});
       setCustomerPrefs({ takeaway: 0, dine_in: 0 });
       setStats({
@@ -126,6 +126,31 @@ const ManagerDashboard = () => {
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 500);
   }, [stats]);
+
+  const categoryChartData = selectedDetailCategory && itemsByCategory[selectedDetailCategory]
+    ? Object.entries(itemsByCategory[selectedDetailCategory] || {})
+        .sort((a, b) => Number(b[1]) - Number(a[1]))
+        .slice(0, 7)
+        .map(([itemName, qty]) => ({
+          name: itemName.length > 10 ? itemName.substring(0, 10) + '...' : itemName,
+          fullName: itemName,
+          terjual: Number(qty)
+        }))
+    : [];
+
+  const CustomCategoryTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="text-sm font-semibold text-gray-900">{payload[0].payload.fullName}</p>
+          <p className="text-sm text-orange-600">
+            Terjual: {payload[0].value}x
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (isLoading) {
     return (
@@ -176,8 +201,8 @@ const ManagerDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Pendapatan</p>
@@ -191,7 +216,7 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Pesanan</p>
@@ -203,7 +228,7 @@ const ManagerDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Produk</p>
@@ -214,133 +239,76 @@ const ManagerDashboard = () => {
               </div>
             </div>
           </div>
-
-          {/* Total Pelanggan card removed - using product count instead */}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">{periodInfo.title}</h3>
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Penjualan per Kategori</h3>
+            <div className="flex items-center space-x-2">
+              <select 
+                value={selectedDetailCategory} 
+                onChange={(e) => setSelectedDetailCategory(e.target.value)} 
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition-colors text-sm"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#ec5766';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(236, 87, 102, 0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgb(209 213 219)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                <option value="food">Makanan</option>
+                <option value="beverages">Minuman</option>
+                <option value="snack">Snack</option>
+              </select>
             </div>
+          </div>
+
+          {(!selectedDetailCategory || !itemsByCategory || Object.keys(itemsByCategory || {}).length === 0 || !itemsByCategory[selectedDetailCategory] || Object.keys(itemsByCategory[selectedDetailCategory] || {}).length === 0) ? (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <div className="text-center">
+                <div className="text-4xl mb-2">📊</div>
+                <p>Data tidak tersedia untuk kategori ini</p>
+              </div>
+            </div>
+          ) : (
             <div className="space-y-4">
               <div className="flex items-center space-x-4 text-sm mb-4">
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Pendapatan</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-orange-200 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Target</span>
+                  <span className="text-gray-600">Terjual</span>
                 </div>
               </div>
               
-              <div className="h-48 flex items-end justify-between space-x-2 rounded-lg p-4">
-                {periodInfo.days.map((day, index) => (
-                  <div key={index} className="flex flex-col items-center flex-1">
-            <div className="w-full max-w-12 h-32 rounded-t-md relative flex flex-col justify-end overflow-hidden">
-              <div className="absolute bottom-0 w-full bg-orange-200 rounded-t-md" style={{height: '100%'}}></div>
-              <div className="absolute bottom-0 w-full bg-orange-500 rounded-t-md transition-all duration-500" style={{height: '0%'}}></div>
-                      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                        <span className="text-xs font-medium text-gray-600 bg-white px-1 py-0.5 rounded shadow-sm whitespace-nowrap">
-                          Rp 0
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-xs font-medium text-gray-600 text-center">
-                      {day.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={categoryChartData} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: '#6b7280', fontSize: 11, fontStyle: 'normal' }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    height={60}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                  />
+                  <Tooltip content={<CustomCategoryTooltip />} />
+                  <Bar dataKey="terjual" fill="#f97316" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
               
               <div className="mt-4 p-3 bg-orange-50 rounded-lg">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-orange-700 font-medium">Total Hari Ini:</span>
-                  <span className="text-orange-800 font-semibold">{periodInfo.summary}</span>
+                  <span className="text-orange-700 font-medium">Total Item Terjual:</span>
+                  <span className="text-orange-800 font-semibold">
+                    {Object.values(itemsByCategory[selectedDetailCategory] || {}).reduce((s, n) => s + Number(n), 0)} items
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Penjualan per Kategori</h3>
-              <div className="flex items-center space-x-2">
-                <select 
-                  value={selectedDetailCategory} 
-                  onChange={(e) => setSelectedDetailCategory(e.target.value)} 
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition-colors text-sm"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#ec5766';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(236, 87, 102, 0.2)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgb(209 213 219)';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                >
-                  <option value="">-- Pilih Kategori --</option>
-                  {Object.keys(categoryData).map(c => (
-                    <option key={c} value={c}>{c.replace(/_/g, ' ').charAt(0).toUpperCase() + c.replace(/_/g, ' ').slice(1)}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {(!selectedDetailCategory || !itemsByCategory || Object.keys(itemsByCategory || {}).length === 0) ? (
-              <div className="flex items-center justify-center h-64 text-gray-500">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">📊</div>
-                  <p>Pilih kategori untuk melihat detail item</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4 text-sm mb-4">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
-                    <span className="text-gray-600">Terjual</span>
-                  </div>
-                </div>
-                
-                <div className="h-48 flex items-end justify-between space-x-2 rounded-lg p-4">
-                  {Object.entries(itemsByCategory[selectedDetailCategory] || {})
-                    .sort((a, b) => Number(b[1]) - Number(a[1]))
-                    .slice(0, 7)
-                    .map(([itemName, qty]) => {
-                      const max = Math.max(...Object.values(itemsByCategory[selectedDetailCategory] || {}).map(n => Number(n)), 1);
-                      const heightPercent = Math.round((Number(qty) / max) * 100);
-                      
-                      return (
-                        <div key={itemName} className="flex flex-col items-center flex-1">
-                          <div className="w-full max-w-12 h-32 rounded-t-md relative flex flex-col justify-end overflow-hidden">
-                            <div className="absolute bottom-0 w-full bg-orange-500 rounded-t-md transition-all duration-500" style={{height: `${heightPercent}%`}}></div>
-                            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                              <span className="text-xs font-medium text-gray-600 bg-white px-1 py-0.5 rounded shadow-sm whitespace-nowrap">
-                                {qty}x
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mt-2 text-xs font-medium text-gray-600 text-center truncate w-full" title={itemName}>
-                            {itemName.length > 10 ? itemName.substring(0, 10) + '...' : itemName}
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-                
-                <div className="mt-4 p-3 bg-orange-50 rounded-lg">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-orange-700 font-medium">Total Item Terjual:</span>
-                    <span className="text-orange-800 font-semibold">
-                      {Object.values(itemsByCategory[selectedDetailCategory] || {}).reduce((s, n) => s + Number(n), 0)} items
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         <div className="mt-8 mb-10">
