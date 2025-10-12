@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: umkm
     environment:
-      - APP_ENV=local
+      - APP_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_DATABASE=${DB_DATABASE}
@@ -84,3 +84,4 @@ volumes:
   php_storage:
   php_bootstrap:
   php_vendor:
+
