@@ -82,7 +82,7 @@ class ProductService
 
         DB::beginTransaction();
         try {
-            if (!empty($fields['image'])) {
+            if (isset($fields['image']) && $fields['image'] instanceof UploadedFile) {
                 $newFilePath = $this->processImage($fields['image']);
                 $fields['image_path'] = $newFilePath;
                 unset($fields['image']);
