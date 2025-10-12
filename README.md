@@ -4,29 +4,22 @@ A Cashier web-based app with Admin analytic dashboard init.
 
 ## Quick Start
 
+>Just a little note if using windows docker can be much slower than in linux
+
 ### Prerequisities
 
 - Docker
 - Docker-Compose
+- Preferably using linux OS
 
 ### Step 1 : Inital Setup (After Cloning)
 
-**If In Linux, GL WIN Users**
+Copy Environment
 
 ```bash
-chmod +x scripts/*
-```
-
-#### Check Environment
-
-```bash
-./scripts/check-environment.sh
-```
-
-#### Copy Environment
-
-```bash
-./scripts/copy-environment.sh
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
 ### Step 2: Start Docker
@@ -37,18 +30,37 @@ Assuming Docker Daemon already started.
 docker-compose up --build -d
 ```
 
-### Step 3: Verify Setup
+### Step 3: Install Dependencies and Caching
+```bash
+docker exec -it umkm composer install --no-dev --optimize-autoloader
+docker exec -it umkm php artisan config:cache
+docker exec -it umkm php artisan route:cache
+```
+
+### Step 4: Permission
+```bash
+docker exec -it umkm chown -R www-data:www-data storage
+docker exec -it umkm chmod -R 775 storage
+```
+
+### Step 5: Dummy Data for Realistic Chart
+```bash
+docker exec -it umkm php artisan migrate:fresh --seed
+```
+
+Just click yes if prompt to do seeder in production.
+
+### Step 6: Verify Setup
 
 ```bash
 curl localhost/api
-curl localhost
 ```
 
-## Some Script To Easily Do Artisan Command
+if return `{"success" : true}`, then laravel is working.
 
-### Migrate:fresh with seed
-
-```bash
-./scripts/database-migrate-fresh-seed.sh
-```
-
+Route for website:
+- `localhost/` : For Welcome Page
+- `localhost/login` : For Login, depend on user's role login, you can get different pages. You can use these credentials that already created from seeders:
+1. username: `irustestlmao` , password: `superuser`
+2. username : `manager01`, password : `password` `// Username Manager from seeder can be manager01 - manager09`
+3. username : `cashier01`, password : `password` `// Username Cashier from seeder can be cashier01 - cashier09`
