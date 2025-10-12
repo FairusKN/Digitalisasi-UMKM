@@ -13,6 +13,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     volumes:
       - ./backend:/var/www/backend
+      - php_storage:/var/www/backend/storage
     networks:
       - appnet
     working_dir: /var/www/backend

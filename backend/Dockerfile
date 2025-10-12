@@ -18,5 +18,10 @@ RUN mkdir -p /var/www/backend/storage /var/www/backend/bootstrap/cache && \
 
 EXPOSE 9000
 
+ARG UID=1000
+ARG GID=1000
+
+RUN usermod -u ${UID} www-data && groupmod -g ${GID} www-data
+
 CMD ["php-fpm"]
 RUN chown -R www-data:www-data /var/www
