@@ -18,6 +18,7 @@ services:
     working_dir: /var/www/backend
     command: >
       sh -c "chown -R www-data:www-data /var/www/backend/storage /var/www/backend/bootstrap/cache &&
+            chmod -R 775 /var/www/backend/storage && 
              php-fpm"
 
   nginx:
@@ -84,4 +85,3 @@ volumes:
   php_storage:
   php_bootstrap:
   php_vendor:
-
