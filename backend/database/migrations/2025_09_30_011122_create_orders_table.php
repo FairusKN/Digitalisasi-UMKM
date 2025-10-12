@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum("payment_method", array_column(PaymentMethod::cases(), "value"));
             $table->timestamps();
 
-            $table->index("user_id");
+            $table->index(["user_id", "created_at"]);
             $table->index("payment_method");
         });
     }
