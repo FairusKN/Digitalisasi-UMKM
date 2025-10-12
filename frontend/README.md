@@ -1,1 +1,0 @@
-**JANGAN NGELUH YA MMK, Thx :D**
