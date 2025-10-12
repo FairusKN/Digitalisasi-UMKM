@@ -19,3 +19,4 @@ RUN mkdir -p /var/www/backend/storage /var/www/backend/bootstrap/cache && \
 EXPOSE 9000
 
 CMD ["php-fpm"]
+RUN chown -R www-data:www-data /var/www
