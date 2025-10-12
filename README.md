@@ -16,10 +16,28 @@ A Cashier web-based app with Admin analytic dashboard init.
 
 Copy Environment
 
+**Linux**
+
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
+```
+
+**Windows (Powershell)**
+
+```bash
+Copy-Item .env.example .env
+Copy-Item backend/.env.example backend/.env
+Copy-Item frontend/.env.example frontend/.env
+```
+
+**Windows (CMD)**
+
+```bash
+copy .env.example .env
+copy backend\.env.example backend\.env
+copy frontend\.env.example frontend\.env
 ```
 
 ### Step 2: Start Docker
@@ -32,10 +50,18 @@ docker-compose up --build -d
 
 ### Step 3: Install Dependencies and Caching
 
+**Linux**
+
 ```bash
 docker exec -it umkm composer install --no-dev --optimize-autoloader
 docker exec -it umkm php artisan config:cache
 docker exec -it umkm php artisan route:cache
+```
+
+**Windows (PWSH/CMD)**
+
+```bash
+docker exec -it umkm bash -c "composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache"
 ```
 
 ### Step 4: Permission
