@@ -25,7 +25,7 @@ class Create extends FormRequest
     {
         return [
             "name" => "required|string|unique:products",
-            "price" => "required|numeric|min:10000|max:9999999999.99",
+            "price" => "required|numeric|min:5000|max:9999999999.99",
             "category" => ["required", new Enum(ProductCategory::class)],
             "image" => "required|file|mimes:jpg,jpeg,png|max:5120",
         ];

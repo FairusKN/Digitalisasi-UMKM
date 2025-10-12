@@ -25,7 +25,7 @@ class Update extends FormRequest
     {
         return [
             "name" => "nullable|string|unique:products",
-            "price" => "nullable|numeric|min:10000|max:9999999999.99",
+            "price" => "nullable|numeric|min:5000|max:9999999999.99",
             "category" => ["nullable", new Enum(ProductCategory::class)],
             "image" => "nullable|file|mimes:jpg,jpeg,png|max:5120",
         ];
