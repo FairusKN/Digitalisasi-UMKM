@@ -35,19 +35,19 @@ services:
       - appnet
 
   # Vue dev server (for hot reload)
-  frontend:
-    image: node:20
-    working_dir: /app
-    volumes:
-      - ./frontend:/app:cached
-      - /app/node_modules # don't leak node_modules to host
-    command: sh -c "yarn install && yarn dev --host 0.0.0.0"
-    ports:
-      - "5173:5173"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    networks:
-      - appnet
+  # frontend:
+  #   image: node:20
+  #   working_dir: /app
+  #   volumes:
+  #     - ./frontend:/app:cached
+  #     - /app/node_modules # don't leak node_modules to host
+  #   command: sh -c "yarn install && yarn dev --host 0.0.0.0"
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   networks:
+  #     - appnet
 
   # Vue build (for production)
   frontend-build:
