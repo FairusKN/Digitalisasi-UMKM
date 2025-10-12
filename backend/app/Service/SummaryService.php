@@ -35,7 +35,10 @@ class SummaryService
                 Carbon::parse($filters['end_date'])->endOfDay(),
             ]);
         } else {
-            $query->whereDate('created_at', Carbon::today());
+            $query->whereBetween('created_at', [
+                now()->subDays(7)->startOfDay(),
+                now()->endOfDay(),
+            ]);
         }
 
         $orders = $query->with('items.product')->get();
