@@ -53,7 +53,14 @@ docker exec -it umkm php artisan migrate:fresh --seed
 
 Just click yes if prompt to do seeder in production.
 
-### Step 6: Verify Setup
+### Step 6: Another Permission
+
+```bash
+docker exec -it umkm chown -R www-data:www-data storage/
+docker exec -it umkm chmod -R 775 storage/
+```
+
+### Step 7: Verify Setup
 
 ```bash
 curl localhost/api
