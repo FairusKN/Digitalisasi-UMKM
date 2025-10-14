@@ -2,32 +2,31 @@
 
 namespace App\Http\Middleware;
 
-use Auth;
+use App\Role;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        $user = Auth::user(); // already guaranteed by `auth:sanctum`
+        $user = Auth::user();
 
-        if (!in_array($role, ['admin', 'super_user'], true)) {
+        $validRoles = array_column(Role::cases(), 'value');
+
+        if (!in_array($role, $validRoles, true)) {
             return response()->json([
-                "message" => "Invalid role specified"
+                'success' => false,
+                'message' => 'Invalid role specified'
             ], 400);
         }
 
-        if ($role === 'admin' && !$user->is_admin) {
+        if ($user->role !== $role) {
             return response()->json([
-                "message" => "Bro is not an admin"
-            ], 403);
-        }
-
-        if ($role === 'super_user' && !$user->is_superuser) {
-            return response()->json([
-                "message" => "Bro is not a super user"
+                'success' => false,
+                'message' => 'Forbidden'
             ], 403);
         }
 

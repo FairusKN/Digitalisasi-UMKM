@@ -2,60 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\Login;
+use App\Http\Requests\Auth\Register;
 use App\Models\User;
-use Hash;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use function PHPUnit\Framework\returnArgument;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function me(): JsonResponse
     {
-        $fields = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'phone_number' => 'required|unique:users',
-            'password' => 'required|confirmed',
-            'is_admin' => 'boolean',
-            'is_superuser' => 'boolean',
-        ]);
-
-        $user = User::create($fields);
-
-        return response()->json([
-            "user" => $user
-        ]);
+        return response()->json();
     }
 
-    public function login(Request $request)
+    public function login(Login $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email|exists:users',
-            //'phone_number' => 'required|exists:users',
-            'password' => 'required',
-        ]);
+        $fields = $request->validated();
+        $user = User::where('username', $fields["username"])->first();
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return [
-                "message" => "The Provided Credentials may be Invalid"
-            ];
+        if (!$user || !Hash::check($fields["password"], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kredensial yang diberikan mungkin tidak valid'
+            ], 400);
         }
 
-        $token =  $user->createToken($user->name);
+        $token = $user->createToken(
+            $user->name,
+            ['*'],
+            now()->addMinutes(config('sanctum.expiration'))
+        );
 
-        return [
-            'user' => $user,
-            'token' => $token->plainTextToken
-        ];
+        return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
+            'data' => [
+                'user' => $user,
+                'token' => $token->plainTextToken
+            ]
+        ], 200);
     }
 
-    public  function logout(Request $request) {
+    public function logout(Request $request) : JsonResponse {
         $request->user()->tokens()->delete();
 
-        return [
-            'message' => "You are logout"
-        ];
+        return response()->json([
+            'success' => true,
+            'message' => 'Anda telah berhasil logout'
+        ], 200);
     }
 }

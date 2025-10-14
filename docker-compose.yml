@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: umkm
     environment:
-      - APP_ENV=local
+      - APP_ENV=production
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_DATABASE=${DB_DATABASE}
@@ -18,6 +18,7 @@ services:
     working_dir: /var/www/backend
     command: >
       sh -c "chown -R www-data:www-data /var/www/backend/storage /var/www/backend/bootstrap/cache &&
+            chmod -R 775 /var/www/backend/storage &&
              php-fpm"
 
   nginx:
@@ -30,6 +31,32 @@ services:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       - php
+    networks:
+      - appnet
+
+  # Vue dev server (for hot reload)
+  # frontend:
+  #   image: node:20
+  #   working_dir: /app
+  #   volumes:
+  #     - ./frontend:/app:cached
+  #     - /app/node_modules # don't leak node_modules to host
+  #   command: sh -c "yarn install && yarn dev --host 0.0.0.0"
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   networks:
+  #     - appnet
+
+  # Vue build (for production)
+  frontend-build:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - ./frontend/dist:/app/dist
+    command: sh -c "yarn install && yarn build"
     networks:
       - appnet
 
@@ -47,7 +74,7 @@ services:
   adminer:
     image: adminer:latest
     ports:
-      - "8080:8080"
+      - "8082:8080"
     networks:
       - appnet
 
